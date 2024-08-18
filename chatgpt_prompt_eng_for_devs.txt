@@ -1,0 +1,108 @@
+ChatGPT Prompt Engineering for Developers:
+- Guidelines
+	- Write clear and specific instructions
+		- Tactic 1: Use delimiters to clearly indicate distinct parts of the input like ```, """, < >, <tag> </tag>, :
+		- Tactic 2: Ask for a structured output like JSON, HTML...
+		- Tactic 3: Ask the model to check whether conditions are satisfied
+		- Tactic 4: Few-shot prompting (give examples of desired output)
+	- Give the model time to think
+		- Tactic 1: Specify the steps required to complete a task
+		- Tactic 2: Instruct the model to work out its own solution before rushing to a conclusion
+
+- Iterative prompt development
+	- Steps:
+		1. Be clear and specific
+		2. Analyze why result does not give desired output
+		3. Refine the idea and the prompt
+		4. Repeat
+	- Issues:
+		- Example: The output is too long -> add a restriction to the size of the output on the prompt
+		- Example: Text focuses on the wrong details -> ask it to focus on relevant aspects to the intended audience
+		- Example: The output format is not expected -> ask it to extract information and organize it in the format expected
+
+- Summarizing
+	- Generally, the prompt has a small context like "Your task is to generate a short summary for <intended audience>"
+	- Then, it can contain restrictions about the size like "Summarize the text below, delimited by triple backticks, in at most 30 words."
+	- Finally, came the text separated with delimiters like "Text:```{text}```"
+
+- Inferring
+	- Sentiment Analysis
+		- Give the text to be analyzed and restrict the output like "Give your answer as a single word, either 'positive' or 'negative'."
+	- Identify types of emotions
+		- Example: "Identify a list of emotions on the text. Include no more than 5 items in the list. Format the list as ..."
+	- Identify anger
+		- Example: "Is the text expressing anger? Give your answer as either yes or no."
+	- Extract information from text
+		- Example: prompt = f"""
+								Identify the following items from the review text: 
+								- Item purchased by reviewer
+								- Company that made the item
+
+								The review is delimited with triple backticks. \
+								Format your response as a JSON object with \
+								"Item" and "Brand" as the keys. 
+								If the information isn't present, use "unknown" \
+								as the value.
+								Make your response as short as possible.
+								  
+								Review text: '''{lamp_review}'''
+								"""
+	- Doing multiple tasks at once
+		- Example: prompt = f"""
+								Identify the following items from the review text: 
+								- Sentiment (positive or negative)
+								- Is the reviewer expressing anger? (true or false)
+								- Item purchased by reviewer
+								- Company that made the item
+
+								The review is delimited with triple backticks. \
+								Format your response as a JSON object with \
+								"Sentiment", "Anger", "Item" and "Brand" as the keys.
+								If the information isn't present, use "unknown" \
+								as the value.
+								Make your response as short as possible.
+								Format the Anger value as a boolean.
+
+								Review text: '''{lamp_review}'''
+								"""
+	- Inferring topics from a piece of text
+		- Example: prompt = f"""
+								Determine five topics that are being discussed in the \
+								following text, which is delimited by triple backticks.
+
+								Make each item one or two words long. 
+
+								Format your response as a list of items separated by commas.
+
+								Text sample: '''{story}'''
+								"""
+	- Make a news alert for certain topics
+		- Example: prompt = f"""
+								Determine whether each item in the following list of \
+								topics is a topic in the text below, which
+								is delimited with triple backticks.
+
+								Give your answer as list with 0 or 1 for each topic.\
+
+								List of topics: {", ".join(topic_list)}
+
+								Text sample: '''{story}'''
+								"""
+
+- Transforming
+	- Translation
+		- Ask the model to translate a piece of text from a language to another, can control the informality level as well
+	- Tone Transformation
+		- Ask the model to rewrite a piece of text in a more formal/informal tone
+	- Format conversion
+		- Translate between JSON, HTML, CSV, etc
+	- Spellcheck/Grammar check
+		- Example: prompt = f"""Proofread and correct the following text
+							    and rewrite the corrected version. If you don't find
+							    and errors, just say "No errors found". Don't use 
+							    any punctuation around the text:
+							    ```{t}```"""
+
+- Expanding
+	- Give the model a small piece of text and ask to expand it
+	- Example: ask a model to generate a reply for a product review, based on the sentiment of the review
